@@ -1,26 +1,23 @@
 let transactions = [];
 let myChart;
-console.log("line3 consolelog")
-
-// if (checkForIndexedDb()) {
-//   console.log('indexedDb True')
-//   useIndexedDb("budgets", "BudgetStore", "get").then(results => {
-//     const budgets = results;
-//     loadBudgets().then(data => {
-//       console.log(data);
-//     });
-//     // renderArticles(mappedData, loadPage);
-//     console.log(budgets)
-//   });
-// };
 
 fetch("/api/transaction")
   .then(response => {
+    
     return response.json();
   })
   .then(data => {
     // save db data on global variable
     transactions = data;
+    if (transactions) {
+      console.log(transactions)
+      saveRecord(transactions)
+    }
+
+    if(!transactions){
+      transactions = useIndexedDb("budgets", "BudgetStore", "get")
+      console.log(transactions)
+    }
     console.log(transactions)
 
     populateTotal();
@@ -125,9 +122,8 @@ function sendTransaction(isAdding) {
   populateChart();
   populateTable();
   populateTotal();
-
+  
   // also send to server
-
   fetch("/api/transaction", {
     method: "POST",
     body: JSON.stringify(transaction),
@@ -136,29 +132,32 @@ function sendTransaction(isAdding) {
       "Content-Type": "application/json"
     }
   })
-    .then(response => {
-      return response.json();
-    })
-    .then(data => {
-      if (data.errors) {
-        errorEl.textContent = "Missing Information";
-      }
-      else {
-        // clear form
-        nameEl.value = "";
-        amountEl.value = "";
-      }
-    })
-    .catch(err => {
-      // fetch failed, so save in indexed db 
-      //=> when I enter (the transaction and amount) with offline, this error comes out
-      //=> resulted in a network error response: an object that was not a Response was passed to respondWith()
-      //=> and.. this error too : saveRecord is not defined 
-      saveRecord(transaction);
+  .then(response => {    
+    return response.json();
+  })
+  .then(data => {
+    if (data.errors) {
+      errorEl.textContent = "Missing Information";
+    }
+    else {
       // clear form
       nameEl.value = "";
       amountEl.value = "";
-    });
+    }
+  })
+  .catch(err => {
+    // fetch failed, so save in indexed db 
+    //=> when I enter (the transaction and amount) with offline, this error comes out
+    //=> resulted in a network error response: an object that was not a Response was passed to respondWith()
+    //=> and.. this error too : saveRecord is not defined 
+    // console.log(err);
+    saveRecord(transaction);
+    // db.budgetstore.saveRecord(transaction);
+
+    // clear form
+    nameEl.value = "";
+    amountEl.value = "";
+  });
 }
 
 document.querySelector("#add-btn").onclick = function () {

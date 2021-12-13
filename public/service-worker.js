@@ -12,6 +12,15 @@ const FILES_TO_CACHE = [
   "./icons/icon-512x512.png"
 ];
 
+function saveRecord(transactions) {
+  if (transactions) {
+    console.log('savedRecord' + JSON.stringify(transactions));
+    useIndexedDb('budgetDatabaseName', 'budgetStoreName', 'put', transactions)
+    .then(value => console.log(value), 
+    reason => {console.log(reason)})
+  }
+}
+
 // install
 self.addEventListener("install", function (evt) {
   // pre cache transaction data
@@ -46,9 +55,11 @@ self.addEventListener("activate", function (evt) {
   self.clients.claim();
 });
 
-// fetch
-self.addEventListener("fetch", function (evt) {
-  if (evt.request.url.includes("/api/")) {
+/// fetch
+self.addEventListener("fetch", function(evt) {
+  // if (evt.request.url.includes("/api")) {
+
+  if (evt.request.url.includes("/api")) {
     evt.respondWith(
       caches.open(DATA_CACHE_NAME).then(cache => {
         return fetch(evt.request)          //evt.request -> evt.request.url
@@ -56,18 +67,13 @@ self.addEventListener("fetch", function (evt) {
             // If the response was good, clone it and store it in the cache.
             if (response.status === 200) {
               cache.put(evt.request.url, response.clone());
-            }
+            } 
+
             return response;
           })
           .catch(err => {
             // Network request failed, try to get it from the cache.
-            return cache.match(evt.request).then((response) => {
-              console.log("success" + response.body.json())
-              // useIndexedDb('budgetDatabase', 'budgetTable','put',transactions)
-            },
-              (reason) => {
-                console.log('reason:' + reason)
-              })    // when offline -> this has an error 
+            return cache.match(evt.request);    // when offline -> this has an error 
             //resulted in a network error response : an object that was not a Response was passed to respondWith()
           });
       }).catch(err => console.log(err))
@@ -78,7 +84,6 @@ self.addEventListener("fetch", function (evt) {
   evt.respondWith(
     caches.open(CACHE_NAME).then(cache => {
       return cache.match(evt.request).then(response => {
-        console.log(response)
         return response || fetch(evt.request);
       });
     })
