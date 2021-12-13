@@ -2,17 +2,17 @@ let transactions = [];
 let myChart;
 console.log("line3 consolelog")
 
-if (checkForIndexedDb()) {
-  console.log('indexedDb True')
-  useIndexedDb("budgets", "BudgetStore", "get").then(results => {
-    const budgets = results;
-    loadBudgets().then(data => {
-      console.log(data);
-    });
-    // renderArticles(mappedData, loadPage);
-    console.log(budgets)
-  });
-};
+// if (checkForIndexedDb()) {
+//   console.log('indexedDb True')
+//   useIndexedDb("budgets", "BudgetStore", "get").then(results => {
+//     const budgets = results;
+//     loadBudgets().then(data => {
+//       console.log(data);
+//     });
+//     // renderArticles(mappedData, loadPage);
+//     console.log(budgets)
+//   });
+// };
 
 fetch("/api/transaction")
   .then(response => {
