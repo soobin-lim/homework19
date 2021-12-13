@@ -1,5 +1,6 @@
 import { useIndexedDb } from "./indexedDb";
 import { checkForIndexedDb } from "./indexedDb";
+
 let transactions = [];
 let myChart;
 console.log("line3 consolelog")
