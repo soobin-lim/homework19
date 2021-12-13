@@ -5,8 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "server": "node server.js",
-    "install": "npm install"
+    "lite-server": "lite-server"
   },
   "repository": {
     "type": "git",
