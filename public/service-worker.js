@@ -16,9 +16,9 @@ const FILES_TO_CACHE = [
 self.addEventListener("install", function (evt) {
   // pre cache transaction data
   evt.waitUntil(
-    caches.open(DATA_CACHE_NAME).then((cache) => {cache.add("/api/transaction")})   // change it to transaction
+    caches.open(DATA_CACHE_NAME).then((cache) => { cache.add("/api/transaction") })   // change it to transaction
   );
-    
+
   // pre cache all static assets
   evt.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(FILES_TO_CACHE))
@@ -30,7 +30,7 @@ self.addEventListener("install", function (evt) {
 });
 
 // activate
-self.addEventListener("activate", function(evt) {
+self.addEventListener("activate", function (evt) {
   evt.waitUntil(
     caches.keys().then(keyList => {
       return Promise.all(
@@ -47,7 +47,7 @@ self.addEventListener("activate", function(evt) {
 });
 
 // fetch
-self.addEventListener("fetch", function(evt) {
+self.addEventListener("fetch", function (evt) {
   if (evt.request.url.includes("/api/")) {
     evt.respondWith(
       caches.open(DATA_CACHE_NAME).then(cache => {
@@ -61,7 +61,12 @@ self.addEventListener("fetch", function(evt) {
           })
           .catch(err => {
             // Network request failed, try to get it from the cache.
-            return cache.match(evt.request);    // when offline -> this has an error 
+            return cache.match(evt.request).then((response) => {
+              console.log("success" + response.json())
+            },
+              (reason) => {
+                console.log('reason:' + reason)
+              })    // when offline -> this has an error 
             //resulted in a network error response : an object that was not a Response was passed to respondWith()
           });
       }).catch(err => console.log(err))
