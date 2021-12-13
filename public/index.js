@@ -136,7 +136,9 @@ function sendTransaction(isAdding) {
     }
   })
   .catch(err => {
-    // fetch failed, so save in indexed db
+    // fetch failed, so save in indexed db 
+    //=> when I enter (the transaction and amount) with offline, this error comes out
+    //=> resulted in a network error response: an object that was not a Response was passed to respondWith()
     saveRecord(transaction);
 
     // clear form
