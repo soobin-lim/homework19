@@ -1,4 +1,5 @@
-export function checkForIndexedDb() {
+
+function checkForIndexedDb() {
   if (!window.indexedDB) {
     console.log("Your browser doesn't support a stable version of IndexedDB.");
     return false;
@@ -6,7 +7,7 @@ export function checkForIndexedDb() {
   return true;
 }
 
-export function useIndexedDb(databaseName, storeName, method, object) {
+function useIndexedDb(databaseName, storeName, method, object) {
   return new Promise((resolve, reject) => {
     const request = window.indexedDB.open(databaseName, 1);
     let db,
