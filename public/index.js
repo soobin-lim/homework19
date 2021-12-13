@@ -127,6 +127,7 @@ function sendTransaction(isAdding) {
   populateTotal();
 
   // also send to server
+
   fetch("/api/transaction", {
     method: "POST",
     body: JSON.stringify(transaction),
@@ -153,8 +154,7 @@ function sendTransaction(isAdding) {
       //=> when I enter (the transaction and amount) with offline, this error comes out
       //=> resulted in a network error response: an object that was not a Response was passed to respondWith()
       //=> and.. this error too : saveRecord is not defined 
-      // saveRecord(transaction);
-      useIndexedDb("budgets", "BudgetStore", "put", transaction)
+      saveRecord(transaction);
       // clear form
       nameEl.value = "";
       amountEl.value = "";
@@ -169,18 +169,22 @@ document.querySelector("#sub-btn").onclick = function () {
   sendTransaction(false);
 };
 
-
-function loadBudgets() {
-  const BASE_URL =
-    "/api/transaction=";
-
-  return new Promise((resolve, reject) => {
-    fetch(BASE_URL)
-      .then(res => res.json())
-      .then(data => {
-        const budgets = createArticleIds(data.budgets);
-        resolve(budgets);
-      });
-  });
+function saveRecord(transaction) {
+  useIndexedDb("budgets", "BudgetStore", "put", transaction)
 }
+
+
+// function loadBudgets() {
+//   const BASE_URL =
+//     "/api/transaction=";
+
+//   return new Promise((resolve, reject) => {
+//     fetch(BASE_URL)
+//       .then(res => res.json())
+//       .then(data => {
+//         const budgets = createArticleIds(data.budgets);
+//         resolve(budgets);
+//       });
+//   });
+// }
 
