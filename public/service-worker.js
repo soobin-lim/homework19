@@ -62,7 +62,8 @@ self.addEventListener("fetch", function (evt) {
           .catch(err => {
             // Network request failed, try to get it from the cache.
             return cache.match(evt.request).then((response) => {
-              console.log("success" + response.json())
+              console.log("success" + response.body.json())
+              // useIndexedDb('budgetDatabase', 'budgetTable','put',transactions)
             },
               (reason) => {
                 console.log('reason:' + reason)
