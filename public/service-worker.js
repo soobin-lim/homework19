@@ -1,20 +1,22 @@
 const CACHE_NAME = "static-cache-v2";
 const DATA_CACHE_NAME = "data-cache-v1";
 const FILES_TO_CACHE = [
-  "/",
-  "/index.html",
-  "/styles.css",
-  "/service-worker.js",
-  "/manifest.webmanifest",
-  "icons/icon-192x192.png",
-  "icons/icon-512x512.png"
+  ".",
+  "./index.html",
+  "./styles.css",
+  "./service-worker.js",
+  "./manifest.webmanifest",
+  "./icons/icon-192x192.png",
+  "./icons/icon-512x512.png"
 ];
 
 // install
 self.addEventListener("install", function (evt) {
-  // pre cache image data
+
+  // pre cache transaction data
   evt.waitUntil(
-    caches.open(DATA_CACHE_NAME).then((cache) => cache.add("/api/transaction"))   // change it to transaction
+    caches.open(DATA_CACHE_NAME).then((cache) => {cache.add("/api/transaction")})   // change it to transaction
+    
   );
     
   // pre cache all static assets
@@ -27,10 +29,31 @@ self.addEventListener("install", function (evt) {
   self.skipWaiting();
 });
 
+function readDB() {
+  idb.open('products', 1).then(function(db) {
+    var tx = db.transaction(['beverages'], 'readonly');
+    var store = tx.objectStore('beverages');
+    return store.getAll();
+  }).then(function(items) {
+    // Use beverage data
+  });
+}
+function createDB() {
+  idb.open('products', 1, function(upgradeDB) {
+    var store = upgradeDB.createObjectStore('beverages', {
+      keyPath: 'id'
+    });
+    store.put({id: 123, name: 'coke', price: 10.99, quantity: 200});
+    store.put({id: 321, name: 'pepsi', price: 8.99, quantity: 100});
+    store.put({id: 222, name: 'water', price: 11.99, quantity: 300});
+  });
+}
+
 // activate
 self.addEventListener("activate", function(evt) {
   evt.waitUntil(
     caches.keys().then(keyList => {
+      createDB();
       return Promise.all(
         keyList.map(key => {
           if (key !== CACHE_NAME && key !== DATA_CACHE_NAME) {
@@ -38,6 +61,8 @@ self.addEventListener("activate", function(evt) {
             return caches.delete(key);
           }
         })
+        
+        
       );
     })
   );
@@ -72,6 +97,7 @@ self.addEventListener("fetch", function(evt) {
   evt.respondWith(
     caches.open(CACHE_NAME).then(cache => {
       return cache.match(evt.request).then(response => {
+        console.log(response)
         return response || fetch(evt.request);
       });
     })
