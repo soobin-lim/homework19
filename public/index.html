@@ -13,6 +13,7 @@
   <link rel="manifest" href="manifest.webmanifest" />
 
   <title>Budget Tracker</title>
+
 </head>
 
 <body>
@@ -56,6 +57,7 @@
         })
         .catch((error) => {
           console.log('Service Worker Registration Failed!');
+          console.log(error);
           console.log(error);
         });
     }
